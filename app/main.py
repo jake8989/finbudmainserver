@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI,HTTPException
 from dotenv import load_dotenv
 from app.db.config import database
 from contextlib import asynccontextmanager
@@ -14,4 +14,8 @@ async def lifespan(app:FastAPI):
 app=FastAPI(lifespan=lifespan)
 @app.get('/')
 async def root():
-    return 'Hii the server is working fine'
+    users_collection=database.db['users']
+    allUsers=await users_collection.find({},{"_id":0}).to_list()
+    if allUsers:
+       return allUsers
+    return HTTPException(status_code=404,detail='No Users Found')
