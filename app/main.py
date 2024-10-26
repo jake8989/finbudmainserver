@@ -1,8 +1,11 @@
 import os
+import strawberry
+from strawberry.fastapi import GraphQLRouter
 from fastapi import FastAPI,HTTPException
 from dotenv import load_dotenv
 from app.db.config import database
 from contextlib import asynccontextmanager
+from app.graphql.mutations.core import Mutation
 load_dotenv()
 @asynccontextmanager
 async def lifespan(app:FastAPI):
@@ -10,12 +13,22 @@ async def lifespan(app:FastAPI):
     yield 
     await database.close()
 
+
+@strawberry.type
+class Query:
+    @strawberry.field
+    def hello(self) -> str:
+        return "Hello From the graphQL"
+
+
+schema = strawberry.Schema(query=Query,mutation=Mutation)
+
+graphql_app = GraphQLRouter(schema)
+
+
 # print(os.getenv('DB_URL'))
 app=FastAPI(lifespan=lifespan)
+app.include_router(graphql_app, prefix="/graphql")
 @app.get('/')
 async def root():
-    users_collection=database.db['users']
-    allUsers=await users_collection.find({},{"_id":0}).to_list()
-    if allUsers:
-       return allUsers
     return HTTPException(status_code=404,detail='No Users Found')
