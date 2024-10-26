@@ -5,7 +5,7 @@ from fastapi import FastAPI,HTTPException
 from dotenv import load_dotenv
 from app.db.config import database
 from contextlib import asynccontextmanager
-from app.graphql.mutations.core import Mutation
+from app.graphql.graphql import Mutation
 load_dotenv()
 @asynccontextmanager
 async def lifespan(app:FastAPI):

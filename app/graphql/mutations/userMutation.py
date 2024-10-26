@@ -28,7 +28,7 @@ class UserMutations:
             )
             print(new_user)
             await database.db['users'].insert_one(new_user.model_dump(by_alias=True))
-            return RegisterUserMutationResponse(success=True,message='User Created Successfully',user=UserType(new_user))
+            return RegisterUserMutationResponse(success=True,message='User Created Successfully',user=UserType(username=new_user.username,email=new_user.email))
 
         except Exception as e:
             return RegisterUserMutationResponse(success=False,message=e)
