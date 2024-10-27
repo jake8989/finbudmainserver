@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 
 class Expense(BaseModel):
-    expenseId:int
-    category:str
-    date:str
+    expenseId:str
+    username:str
     amount:int
+    category:str
+    expenseDate:str
