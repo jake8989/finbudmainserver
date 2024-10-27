@@ -1,27 +1,56 @@
+from datetime import datetime, timezone, timedelta
 import jwt
-import os
-from datetime import datetime,timedelta,timezone
 from jwt import ExpiredSignatureError, InvalidTokenError
+import os
+from typing import Optional
+from dataclasses import dataclass
+
+
 class JwtToken:
     @staticmethod
-    async def CreateToken(data:dict)->str:
-        encode_with_expiry=data.copy()
-        expire_delta=timedelta(hours=1)
-        expire=datetime.now(timezone.utc)+expire_delta
-        encode_with_expiry.update({"exp":expire})
-
-        token=jwt.encode(encode_with_expiry,os.getenv('JWT_SECRET'),algorithm='HS256')
-        return token
-    
-    @staticmethod
-    async def VerifyToken(token:str):
+    async def CreateToken(data: dict) -> str:
         try:
-            decoded_token=jwt.decode(token,os.getenv("JWT_SECRET"),algorithm='HS256')
-            return decoded_token
- 
+            encode_with_expiry = data.copy()
+            expire_delta = timedelta(hours=1)
+            expire = datetime.now(timezone.utc) + expire_delta
+            encode_with_expiry.update({"exp": expire})
+            
+            # Make sure JWT_SECRET is available
+            jwt_secret = os.getenv('JWT_SECRET')
+            if not jwt_secret:
+                return ''
+                
+            token = jwt.encode(
+                encode_with_expiry,
+                jwt_secret,
+                algorithm='HS256'
+            )
+            return token
+            
+        except Exception as e:
+            print(f"Error creating token: {str(e)}")
+            return ''
+
+    @staticmethod
+    async def VerifyToken(token: str):
+        try:
+            jwt_secret = os.getenv('JWT_SECRET')
+            if not jwt_secret:
+                return ''
+                
+            decoded_token = jwt.decode(
+                token,
+                jwt_secret,
+                algorithms=['HS256']
+            )
+            return ''
+            
         except ExpiredSignatureError:
             print('Token Expired')
-        except InvalidTokenError:
-            print('Invalid Token')
-                 
-    
+            return ''
+        except InvalidTokenError as e:
+            print(f'Invalid Token: {str(e)}')
+            return ''
+        except Exception as e:
+            print(f'Error verifying token: {str(e)}')
+            return ''

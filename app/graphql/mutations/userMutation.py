@@ -1,14 +1,13 @@
 import strawberry
-from app.graphql.schemas.UserSchema import UserType,UserInput
+from app.graphql.schemas.UserSchema import UserType,UserInput,UserLoginInput
 from app.db.config import database
 from pydantic import BaseModel
 from typing import Optional
 from app.modals.UserModal import UserModal
 from app.utils.passwordHasher import PasswordHasher
 from app.utils.jwt import JwtToken
-
 @strawberry.type
-class RegisterUserMutationResponse:
+class UserMutationResponse:
     success:bool
     message:str
     token:Optional[str]=None
@@ -16,11 +15,13 @@ class RegisterUserMutationResponse:
 
 class UserMutations:
     @staticmethod
-    async def registerUser(self,user:UserInput)->RegisterUserMutationResponse:
+    async def registerUser(self,user:UserInput)->UserMutationResponse:
         try:
             existing_user=await database.db['users'].find_one({"username":user.username})
+            
+            
             if existing_user:
-                return RegisterUserMutationResponse(success=False,message='Username Already in use')
+                return UserMutationResponse(success=False,message='Username Already in use')
             #pydentic modal for extra type and shape safety
             hashedPassword=await PasswordHasher.Hash(user.password)
             new_user=UserModal(
@@ -30,11 +31,37 @@ class UserMutations:
                 settedGoals=0,
                 goals=[]
             )
+
             token=await JwtToken.CreateToken({"username":user.username})
-            my=await JwtToken.VerifyToken(token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Impha2UiLCJleHAiOjE3Mjk5ODEyNjd9.ESJmYwythu2Pv7aXt2hrGz1yWbxLLEBbod1fk0UY2FI')
-            print(my)
+
             await database.db['users'].insert_one(new_user.model_dump(by_alias=True))
-            return RegisterUserMutationResponse(success=True,message='User Created Successfully',token=token, user=UserType(username=new_user.username,email=new_user.email))
+
+            return UserMutationResponse(success=True,message='User Created Successfully',token=token, user=UserType(username=new_user.username,email=new_user.email))
+        except Exception as e:
+            return UserMutationResponse(success=False,message=e)
+            
+        
+    @staticmethod
+    async def loginUser(self,user:UserLoginInput)->UserMutationResponse:
+        try:
+           # find weather this user exists or not with username
+           exist_user=await database.db['users'].find_one({"username":user.username})
+           
+           if exist_user:
+               verify_password=await PasswordHasher.VerifyPassword(password=user.password,hashedPassword=exist_user['password'])
+               if verify_password:
+                   token=await JwtToken.CreateToken({"username":exist_user['username']})
+                   return UserMutationResponse(success=True,message="Logged In Successfully",token=token,user=UserType(username=exist_user['username'],email=exist_user['email']))
+
+               return UserMutationResponse(success=False,message='Invalid Credentails')    
+               
+
+           return UserMutationResponse(success=False,message='Invalid Credentails')     
+
+
+           
 
         except Exception as e:
-            return RegisterUserMutationResponse(success=False,message=e)
+            return UserMutationResponse(success=False,message=e)
+
+

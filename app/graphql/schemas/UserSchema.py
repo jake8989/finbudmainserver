@@ -23,6 +23,10 @@ class UserType():
     username:str
     email:str
 
+@strawberry.input
+class UserLoginInput():
+    username:str
+    password:str
 
 @strawberry.input
 class UserInput():
