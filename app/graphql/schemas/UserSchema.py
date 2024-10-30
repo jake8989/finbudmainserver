@@ -4,9 +4,14 @@ from enum import Enum
 
 
 @strawberry.enum
-class GoalType(str,Enum):
+class GoalMethod(str,Enum):
      SAVING='saving'
      EXPENSE='expense'
+
+@strawberry.type
+class ExpenseType():
+    expenseId:str
+    expenseType:str
 
 @strawberry.type
 class GoalType():
@@ -16,7 +21,7 @@ class GoalType():
     startDate:str
     endDate:str
     description:Optional[str]=None
-    goalCategory:GoalType
+    goalCategory:GoalMethod
 
 @strawberry.type
 class UserType():

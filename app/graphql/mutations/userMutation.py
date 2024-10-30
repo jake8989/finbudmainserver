@@ -18,7 +18,7 @@ class UserMutations:
     async def registerUser(self,user:UserInput)->UserMutationResponse:
         try:
             existing_user=await database.db['users'].find_one({"username":user.username})
-            
+           
             
             if existing_user:
                 return UserMutationResponse(success=False,message='Username Already in use')
@@ -29,7 +29,8 @@ class UserMutations:
                 email=user.email,
                 password=hashedPassword,
                 settedGoals=0,
-                goals=[]
+                goals=[],
+                expenseCategories=[]
             )
 
             token=await JwtToken.CreateToken({"username":user.username})
@@ -46,7 +47,7 @@ class UserMutations:
         try:
            # find weather this user exists or not with username
            exist_user=await database.db['users'].find_one({"username":user.username})
-           
+           print(user)
            if exist_user:
                verify_password=await PasswordHasher.VerifyPassword(password=user.password,hashedPassword=exist_user['password'])
                if verify_password:
@@ -56,7 +57,7 @@ class UserMutations:
                return UserMutationResponse(success=False,message='Invalid Credentails')    
                
 
-           return UserMutationResponse(success=False,message='Invalid Credentails')     
+           return UserMutationResponse(success=False,message='User not found!')     
 
 
            

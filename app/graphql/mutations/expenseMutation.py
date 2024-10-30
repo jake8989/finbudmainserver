@@ -1,18 +1,19 @@
 import strawberry
 import uuid
-from app.graphql.schemas.ExpenseSchema import ExpenseInput,ExpenseResponseType
+from app.graphql.schemas.ExpenseSchema import ExpenseInput,ExpenseResponseType,ExpenseGetCategoriesResponseType,ExpenseCategoryInput
 from app.modals.ExpenseModal import Expense
 from app.db.config import database
+from typing import Optional
+@strawberry.type
+class ExpenseCategoryResponse():
+    success:bool
+    message:str
+
+
 class ExpenseMutation():
     @staticmethod
     async def createExpense(self,expense:ExpenseInput)->ExpenseResponseType:
         try:
-            # print(expense)
-    #         expenseId:str
-    # username:str
-    # amount:int
-    # category:str
-    # expenseDate:str
             new_expense=Expense(
                 expenseId=str(uuid.uuid4()),
                 username=expense.username,
@@ -27,15 +28,65 @@ class ExpenseMutation():
             return ExpenseResponseType(success=True,message='Expense Created Successfully!',expenseId=new_expense.expenseId)
 
 
-
-
-
-
         except Exception as e:
             print(e)   
             return ExpenseResponseType(success=False,message='Server Error') 
 
+    @staticmethod
+    async def getAllExpenseCategories(self,username:str)->ExpenseGetCategoriesResponseType:
+        try:
+            userExpenseCategories=database.db['']
+            pass
+        except Exception as e:
+            print(e) 
 
+
+    @staticmethod
+    async def createNewExpenseCategory(self,expenseCategory:ExpenseCategoryInput)->ExpenseCategoryResponse:
+        try:
+            existUser=await database.db['users'].find_one({"username":expenseCategory.username})
+            ## secure this path
+            allExpenseCategories=existUser['expenseCategories']
+            newCategory=expenseCategory.expenseCategory.upper()
+
+
+            if newCategory in allExpenseCategories:
+                return ExpenseCategoryResponse(success=False,message="Expense Category Already Exists!")
+            
+
+            #append 
+            allExpenseCategories.append(newCategory)
+            await database.db['users'].update_one({"username":expenseCategory.username},{"$set":{"expenseCategories":allExpenseCategories}})
+            return ExpenseCategoryResponse(success=True,message='Expense Category Added Succesfully')  
+            
+        except Exception as e:
+            print(e)     
+            return ExpenseCategoryResponse(success=False,message=e)  
+
+    @staticmethod
+    async def deleteExistExpenseCategory(self,expenseCategory:ExpenseCategoryInput)->ExpenseCategoryResponse:
+        try:
+            existUser=await database.db['users'].find_one({"username":expenseCategory.username})
+            if not existUser:
+                return ExpenseCategoryResponse(success=False,message='User Not Found!')
+               
+            
+            allExpenseCategories=existUser.expenseCategories
+            expenseCategoryToBeDeleted=expenseCategory.expenseCategory
+            if expenseCategoryToBeDeleted in allExpenseCategories:
+                updated_categories=[cat for cat in allExpenseCategories if cat!=expenseCategoryToBeDeleted]
+                await database.db['users'].update_one({"username":expenseCategory.username},{"$set":{"expenseCategories":updated_categories}})
+                return ExpenseCategoryResponse(success=True,message='Expense Category Removed!')
+            
+
+
+            return ExpenseCategoryResponse(success=False,message="Expense Category Not Found!")
+
+
+        except Exception as e:
+            print(e) 
+            return ExpenseCategoryResponse(success=False,message=e)
+                    
 
 
 

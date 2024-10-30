@@ -6,6 +6,10 @@ class GoalCategory(str,Enum):
      SAVING='saving'
      EXPENSE='expense'
       
+class ExpenseCategories(BaseModel):
+    expenseId:str
+    expenseType:str
+
 class GoalModal(BaseModel):
     goalId:str
     username:str
@@ -22,3 +26,4 @@ class UserModal(BaseModel):
     password:str
     settedGoals:int=0
     goals:List[GoalModal]=[]
+    expenseCategories:List[ExpenseCategories]=[]
