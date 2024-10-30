@@ -16,9 +16,11 @@ class ExpenseInput():
 
 
 
-strawberry.type
+@strawberry.type
 class ExpenseGetCategoriesResponseType():
-    userExpenseCategories:List[str]
+    success:bool
+    userExpenseCategories:List[str]=None
+
 
 
 @strawberry.input

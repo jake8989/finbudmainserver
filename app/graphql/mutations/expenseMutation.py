@@ -1,9 +1,9 @@
 import strawberry
 import uuid
-from app.graphql.schemas.ExpenseSchema import ExpenseInput,ExpenseResponseType,ExpenseGetCategoriesResponseType,ExpenseCategoryInput
+from app.graphql.schemas.ExpenseSchema import ExpenseInput,ExpenseResponseType,ExpenseCategoryInput
 from app.modals.ExpenseModal import Expense
 from app.db.config import database
-from typing import Optional
+
 @strawberry.type
 class ExpenseCategoryResponse():
     success:bool
@@ -32,13 +32,7 @@ class ExpenseMutation():
             print(e)   
             return ExpenseResponseType(success=False,message='Server Error') 
 
-    @staticmethod
-    async def getAllExpenseCategories(self,username:str)->ExpenseGetCategoriesResponseType:
-        try:
-            userExpenseCategories=database.db['']
-            pass
-        except Exception as e:
-            print(e) 
+    
 
 
     @staticmethod
