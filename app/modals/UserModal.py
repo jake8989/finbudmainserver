@@ -1,7 +1,7 @@
 from pydantic import BaseModel,Field
 from typing import List,Optional
 from enum import Enum
-
+from app.graphql.schemas.GoalSchema import GoalType
 class GoalCategory(str,Enum):
      SAVING='saving'
      EXPENSE='expense'
@@ -10,14 +10,7 @@ class ExpenseCategories(BaseModel):
     expenseId:str
     expenseType:str
 
-class GoalModal(BaseModel):
-    goalId:str
-    username:str
-    goalAmount:int
-    startDate:str
-    endDate:str
-    description:Optional[str]=None
-    goalCategory:GoalCategory
+
     
 
 class UserModal(BaseModel):
@@ -25,5 +18,5 @@ class UserModal(BaseModel):
     email:str
     password:str
     settedGoals:int=0
-    goals:List[GoalModal]=[]
+    goals:List[GoalType]=[]
     expenseCategories:List[ExpenseCategories]=[]

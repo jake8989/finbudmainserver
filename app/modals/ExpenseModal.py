@@ -5,5 +5,6 @@ class Expense(BaseModel):
     username:str
     amount:int
     category:str
+    description:str
     expenseDate:str
 

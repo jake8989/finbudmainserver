@@ -1,0 +1,81 @@
+import uuid
+import strawberry
+from app.db.config import database
+from app.graphql.schemas.GoalSchema import GoalType,GoalInput,GoalReponseType,DeleteGoalInputType
+
+@strawberry.type
+class GoalMutation():
+    @staticmethod
+    async def addNewGoal(goal:GoalInput)->GoalReponseType:
+        try:
+           exist_user=await database.db['users'].find_one({"username":goal.username})
+           if not exist_user:
+              return GoalReponseType(success=False,message="No user Exists!")
+           
+           allUserGoals=exist_user['goals']
+           
+           # exception here goals cannot exceed length of 6
+           if len(allUserGoals)>=6:
+               return GoalReponseType(success=False,message="you cannot create more than 6 goals")
+               
+    
+           newGoal=GoalType(
+               goalId=str(uuid.uuid4()),
+               goalAmount=goal.goalAmount,
+               goalCategory=goal.goalCategory,
+               goalDescription=goal.goalDescription,
+               goalStartDate=goal.goalStartDate,
+               goalEndDate=goal.goalEndDate,
+               goalType=goal.goalType,
+               goalReminderFreq=goal.goalReminderFreq
+           )
+           newGoal=newGoal.__dict__
+           allUserGoals.append(newGoal)
+           
+           await database.db['users'].find_one_and_update({"username":goal.username},{"$set":{"goals":allUserGoals}})
+           #graphql expects the goal to be a object not a dictionary so converting back to object
+           newGoal=GoalType(**newGoal)
+           return GoalReponseType(success=True,message="goal added successfully!",goal=newGoal)
+           
+           
+
+        except Exception as e:
+            return GoalReponseType(success=False,message=e)
+        
+    @staticmethod
+    async def deleteGoal(goal:DeleteGoalInputType)->GoalReponseType:
+        try:
+           exist_user=await database.db['users'].find_one({"username":goal.username})
+           if not exist_user:
+              return GoalReponseType(success=False,message="No user Exists!")
+           allUsersGoals=exist_user['goals']
+        #    print(allUsersGoals)
+           
+           goalIdToBeDeleted=goal.goalId
+           isExists=False
+           for i in range(len(allUsersGoals)):
+               if goalIdToBeDeleted == allUsersGoals[i]['goalId']:
+                   isExists=True
+                   break
+           
+            
+           if isExists==False:
+              return GoalReponseType(success=False,message='Goal not found!') 
+               
+                
+                   
+               
+           
+           goalsAfterDeletion=[goal for goal in allUsersGoals if goal['goalId']!=goalIdToBeDeleted]
+           
+           await database.db['users'].find_one_and_update({"username":goal.username},{"$set":{"goals":goalsAfterDeletion}})
+           return GoalReponseType(success=True,message='Goal Deleted Succesfully!')     
+            
+        except Exception as e:
+            print(e)
+            return GoalReponseType(success=False,message='Server Error!')  
+             
+        
+
+        
+

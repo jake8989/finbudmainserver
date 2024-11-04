@@ -19,6 +19,7 @@ class ExpenseMutation():
                 username=expense.username,
                 amount=expense.amount,
                 category=expense.category,
+                description=expense.description,
                 expenseDate=expense.expenseDate
             )
 

@@ -12,9 +12,18 @@ class ExpenseInput():
     username:str
     amount:int
     category:str
+    description:str
     expenseDate:str
 
-
+@strawberry.input
+class GoalInput():
+    goalAmount:int
+    goalDescription:str
+    goalStartDate:str
+    goalEndDate:str
+    goalCategory:str
+    goalReminderFreq:str
+    goalType:str
 
 @strawberry.type
 class ExpenseGetCategoriesResponseType():
