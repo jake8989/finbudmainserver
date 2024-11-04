@@ -1,7 +1,7 @@
 import uuid
 import strawberry
 from app.db.config import database
-from app.graphql.schemas.GoalSchema import GoalType,GoalInput,GoalReponseType,DeleteGoalInputType
+from app.graphql.schemas.GoalSchema import GoalType,GoalInput,GoalReponseType,DeleteGoalInputType,EditGoalInputType
 
 @strawberry.type
 class GoalMutation():
@@ -74,6 +74,36 @@ class GoalMutation():
         except Exception as e:
             print(e)
             return GoalReponseType(success=False,message='Server Error!')  
+        
+        
+    @staticmethod
+    async def editGoal(goal:EditGoalInputType)->GoalReponseType:
+        try:
+            exist_user=await database.db['users'].find_one({"username":goal.username})
+            if not exist_user:
+                return GoalReponseType(success=False,message='User not found!')
+            
+            updationRequired={}
+            if goal.goalAmount is not None:
+                updationRequired["goals.$.goalAmount"]=goal.goalAmount
+            if goal.goalEndDate is not None:
+                updationRequired["goals.$.goalEndDate"]=goal.goalEndDate
+            if goal.goalDescription is not None:
+                updationRequired["goals.$.goalDescription"]=goal.goalDescription  
+            # print(updationRequired)    
+            result=await database.db['users'].update_one({"username":goal.username,"goals.goalId":goal.goalId},{"$set":updationRequired})   
+              
+            if result.matched_count==0:
+                return  GoalReponseType(success=False,message='GoalId not found!')    
+             
+            return GoalReponseType(success=True, message=f"Goal with ID {goal.goalId} updated successfully.")
+            
+            
+            
+        except Exception as e:
+            print(e)
+            return GoalReponseType(success=False,message='Server Error!')
+            
              
         
 

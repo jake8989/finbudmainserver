@@ -18,6 +18,7 @@ class Mutation:
     createExpenseCategory:ExpenseCategoryResponse=strawberry.mutation(resolver=ExpenseMutation.createNewExpenseCategory)
     addNewGoal:GoalReponseType=strawberry.mutation(resolver=GoalMutation.addNewGoal)
     deleteGoal:GoalReponseType=strawberry.mutation(resolver=GoalMutation.deleteGoal)
+    editGoal:GoalReponseType=strawberry.mutation(resolver=GoalMutation.editGoal)
 
 @strawberry.type
 class Query:

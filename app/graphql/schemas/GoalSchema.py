@@ -16,6 +16,15 @@ class GoalInput():
 class DeleteGoalInputType():
     goalId:str
     username:str
+    
+    
+@strawberry.input
+class EditGoalInputType():
+    goalId:str
+    username:str
+    goalAmount:Optional[int]=None
+    goalEndDate:Optional[str]=None
+    goalDescription:Optional[str]=None
 
 @strawberry.type
 class GoalType():
@@ -28,7 +37,10 @@ class GoalType():
     goalType:str
     goalReminderFreq:str
 
-
+# @strawberry.type
+# class EditGoalType():
+    
+    
 
 @strawberry.type
 class GoalReponseType():
