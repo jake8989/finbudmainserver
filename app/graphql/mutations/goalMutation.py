@@ -92,11 +92,13 @@ class GoalMutation():
                 updationRequired["goals.$.goalDescription"]=goal.goalDescription  
             # print(updationRequired)    
             result=await database.db['users'].update_one({"username":goal.username,"goals.goalId":goal.goalId},{"$set":updationRequired})   
-              
+            # print(result)  
+            user=await database.db['users'].find_one({"username":goal.username})
+            updateGoal = next((g for g in user['goals'] if g['goalId'] == goal.goalId), None)
             if result.matched_count==0:
                 return  GoalReponseType(success=False,message='GoalId not found!')    
              
-            return GoalReponseType(success=True, message=f"Goal with ID {goal.goalId} updated successfully.")
+            return GoalReponseType(success=True, message=f"Goal with ID {goal.goalId} updated successfully.",goal=GoalType(**updateGoal))
             
             
             
