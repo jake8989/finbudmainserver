@@ -11,7 +11,7 @@ class JwtToken:
     async def CreateToken(data: dict) -> str:
         try:
             encode_with_expiry = data.copy()
-            expire_delta = timedelta(hours=1)
+            expire_delta = timedelta(hours=24)
             expire = datetime.now(timezone.utc) + expire_delta
             encode_with_expiry.update({"exp": expire})
             
@@ -36,21 +36,21 @@ class JwtToken:
         try:
             jwt_secret = os.getenv('JWT_SECRET')
             if not jwt_secret:
-                return ''
+                return None
                 
             decoded_token = jwt.decode(
                 token,
                 jwt_secret,
                 algorithms=['HS256']
             )
-            return ''
+            return decoded_token
             
         except ExpiredSignatureError:
             print('Token Expired')
-            return ''
+            return None
         except InvalidTokenError as e:
             print(f'Invalid Token: {str(e)}')
-            return ''
+            return None
         except Exception as e:
             print(f'Error verifying token: {str(e)}')
-            return ''
+            return None

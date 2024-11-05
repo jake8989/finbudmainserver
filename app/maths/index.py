@@ -1,0 +1,1 @@
+print("Maths Related things should be done here!")
