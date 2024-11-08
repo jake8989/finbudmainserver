@@ -13,6 +13,11 @@ class GoalInput():
     
     
 @strawberry.input
+class GetAllUserGoalsType():
+    username:str
+
+        
+@strawberry.input
 class DeleteGoalInputType():
     goalId:str
     username:str
@@ -40,6 +45,11 @@ class GoalType():
 # @strawberry.type
 # class EditGoalType():
     
+@strawberry.type
+class AllUserGoalsResponseType():
+    success:bool
+    allUserGoals:Optional[GoalType]
+        
     
 
 @strawberry.type
