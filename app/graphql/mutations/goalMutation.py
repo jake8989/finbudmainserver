@@ -1,7 +1,7 @@
 import uuid
 import strawberry
 from app.db.config import database
-from app.graphql.schemas.GoalSchema import GoalType,GoalInput,GoalReponseType,DeleteGoalInputType,EditGoalInputType
+from app.graphql.schemas.GoalSchema import GoalType,GoalInput,GoalReponseType,DeleteGoalInputType,EditGoalInputType,AllUserGoalsResponseType
 
 @strawberry.type
 class GoalMutation():
@@ -105,6 +105,19 @@ class GoalMutation():
         except Exception as e:
             print(e)
             return GoalReponseType(success=False,message='Server Error!')
+    
+    
+    @staticmethod
+    async def getAllUserGoals(username:str)->AllUserGoalsResponseType:
+        try:
+            exists_user=await database.db['users'].find_one({"username":username})
+            if exists_user:
+                return  AllUserGoalsResponseType(success=True,allUserGoals=exists_user['goals'])
+            
+            return AllUserGoalsResponseType(success=False)
+        except Exception as e:
+            print(e)
+            return AllUserGoalsResponseType(success=False)
             
              
         

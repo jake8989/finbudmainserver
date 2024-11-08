@@ -4,7 +4,8 @@ from app.graphql.mutations.userMutation import UserMutations
 from app.graphql.mutations.userMutation import UserMutationResponse
 from app.graphql.mutations.expenseMutation import ExpenseMutation,ExpenseCategoryResponse
 from app.graphql.mutations.goalMutation import GoalMutation
-from app.graphql.schemas.GoalSchema import GoalReponseType
+from app.graphql.queries.goalQuery import GoalQuery
+from app.graphql.schemas.GoalSchema import GoalReponseType,AllUserGoalsResponseType
 from app.graphql.schemas.ExpenseSchema import ExpenseResponseType,ExpenseGetCategoriesResponseType
 from app.graphql.queries.testQuery import TestQuery
 from app.graphql.queries.expenseQuery import ExpenseQuery
@@ -24,3 +25,4 @@ class Mutation:
 class Query:
     testQuery:str=strawberry.mutation(resolver=TestQuery.testQuery)
     getAllExpenseCategories:ExpenseGetCategoriesResponseType=strawberry.mutation(resolver=ExpenseQuery.getAllExpenseCategories)
+    getAllUserGoals:AllUserGoalsResponseType=strawberry.mutation(resolver=GoalQuery.getAllUserGoals)

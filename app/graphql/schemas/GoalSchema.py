@@ -1,5 +1,5 @@
 import strawberry
-from typing import Optional
+from typing import Optional,List
 @strawberry.input
 class GoalInput():
     username:str
@@ -48,7 +48,7 @@ class GoalType():
 @strawberry.type
 class AllUserGoalsResponseType():
     success:bool
-    allUserGoals:Optional[GoalType]
+    allUserGoals:Optional[List[GoalType]]=None
         
     
 
