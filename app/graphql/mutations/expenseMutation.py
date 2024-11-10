@@ -15,6 +15,10 @@ class ExpenseMutation():
     @staticmethod
     async def createExpense(self,expense:ExpenseInput)->ExpenseResponseType:
         try:
+            exist_user=await database.db['users'].find_one({"username":expense.username})
+            if not exist_user:
+                return ExpenseResponseType(success=False,message='This action cannot be performed please login again to continue') 
+                
             new_expense=Expense(
                 expenseId=str(uuid.uuid4()),
                 username=expense.username,
@@ -23,7 +27,27 @@ class ExpenseMutation():
                 description=expense.description,
                 expenseDate=expense.expenseDate
             )
+            
 
+            #if there exists any goal with this category if it is then update the amount the notify the user
+            allUserGoals=exist_user['goals']
+            
+            exist_goal_with_same_category=next((g for g in allUserGoals if g['goalCategory']==expense.category),None)
+            
+            if exist_goal_with_same_category:
+                if exist_goal_with_same_category['goalType']=='Spending Goal':
+                    newGoalAmount=exist_goal_with_same_category['goalAmount']-expense.amount
+                    if newGoalAmount<0:
+                        newGoalAmount=0
+                        
+                    
+                    await database.db['users'].update_one({"username":expense.username,"goals.goalCategory":exist_goal_with_same_category['goalCategory']},{
+                        "$set":{
+                            "goals.$.goalAmount":newGoalAmount
+                        }
+                    })    
+            
+            
             await database.db['expenses'].insert_one(new_expense.model_dump(by_alias=True))
             # print(created_expense)
 
@@ -42,6 +66,8 @@ class ExpenseMutation():
         try:
             existUser=await database.db['users'].find_one({"username":expenseCategory.username})
             ## secure this path
+            if not existUser:
+                return ExpenseCategoryResponse(success=False,message="This action cannot be performed please login again to continue")
             allExpenseCategories=existUser['expenseCategories']
             newCategory=expenseCategory.expenseCategory.upper()
 

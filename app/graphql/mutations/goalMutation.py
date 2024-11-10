@@ -17,6 +17,11 @@ class GoalMutation():
            # exception here goals cannot exceed length of 6
            if len(allUserGoals)>=6:
                return GoalReponseType(success=False,message="you cannot create more than 6 goals")
+           
+           
+           existing_goal = next((g for g in allUserGoals if g['goalCategory'] == goal.goalCategory), None)
+           if existing_goal:
+               return GoalReponseType(success=False,message="A goal with same category exists!")
                
     
            newGoal=GoalType(
