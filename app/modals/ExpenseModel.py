@@ -8,3 +8,4 @@ class Expense(BaseModel):
     description:str
     expenseDate:str
 
+

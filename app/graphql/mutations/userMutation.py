@@ -3,7 +3,7 @@ from app.graphql.schemas.UserSchema import UserType,UserInput,UserLoginInput
 from app.db.config import database
 from pydantic import BaseModel
 from typing import Optional
-from app.modals.UserModal import UserModal
+from app.modals.UserModel import UserModal
 from app.utils.passwordHasher import PasswordHasher
 from app.utils.jwt import JwtToken
 @strawberry.type

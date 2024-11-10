@@ -20,7 +20,7 @@ class GoalMutation():
                
     
            newGoal=GoalType(
-               goalId=str(uuid.uuid4()),
+               goalId=str(exist_user['settedGoals']+1),
                goalAmount=goal.goalAmount,
                goalCategory=goal.goalCategory,
                goalDescription=goal.goalDescription,
@@ -33,6 +33,7 @@ class GoalMutation():
            allUserGoals.append(newGoal)
            
            await database.db['users'].find_one_and_update({"username":goal.username},{"$set":{"goals":allUserGoals}})
+           await database.db['users'].find_one_and_update({"username":goal.username},{"$set":{"settedGoals":exist_user['settedGoals']+1}})
            #graphql expects the goal to be a object not a dictionary so converting back to object
            newGoal=GoalType(**newGoal)
            return GoalReponseType(success=True,message="goal added successfully!",goal=newGoal)
@@ -68,7 +69,8 @@ class GoalMutation():
            
            goalsAfterDeletion=[goal for goal in allUsersGoals if goal['goalId']!=goalIdToBeDeleted]
            
-           await database.db['users'].find_one_and_update({"username":goal.username},{"$set":{"goals":goalsAfterDeletion}})
+           await database.db['users'].find_one_and_update({"username":goal.username},{"$set":{"goals":goalsAfterDeletion,"settedGoals":exist_user['settedGoals']-1}})
+          
            return GoalReponseType(success=True,message='Goal Deleted Succesfully!')     
             
         except Exception as e:
@@ -84,7 +86,7 @@ class GoalMutation():
                 return GoalReponseType(success=False,message='User not found!')
             
             updationRequired={}
-            if goal.goalAmount is not None:
+            if goal.goalAmount is not None and goal.goalAmount!=0:
                 updationRequired["goals.$.goalAmount"]=goal.goalAmount
             if goal.goalEndDate is not None:
                 updationRequired["goals.$.goalEndDate"]=goal.goalEndDate
@@ -107,17 +109,7 @@ class GoalMutation():
             return GoalReponseType(success=False,message='Server Error!')
     
     
-    @staticmethod
-    async def getAllUserGoals(username:str)->AllUserGoalsResponseType:
-        try:
-            exists_user=await database.db['users'].find_one({"username":username})
-            if exists_user:
-                return  AllUserGoalsResponseType(success=True,allUserGoals=exists_user['goals'])
-            
-            return AllUserGoalsResponseType(success=False)
-        except Exception as e:
-            print(e)
-            return AllUserGoalsResponseType(success=False)
+    
             
              
         

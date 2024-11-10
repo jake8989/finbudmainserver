@@ -7,6 +7,7 @@ from app.db.config import database
 from contextlib import asynccontextmanager
 from app.graphql.graphql import Mutation,Query
 from fastapi.middleware.cors import CORSMiddleware
+from app.graphql.queries.chartQuery import accumulatedDataInput
 load_dotenv()
 
 @asynccontextmanager
@@ -22,7 +23,6 @@ async def lifespan(app:FastAPI):
 schema = strawberry.Schema(query=Query,mutation=Mutation)
 
 graphql_app = GraphQLRouter(schema)
-
 
 # print(os.getenv('DB_URL'))
 app=FastAPI(lifespan=lifespan)

@@ -9,6 +9,10 @@ from app.graphql.schemas.GoalSchema import GoalReponseType,AllUserGoalsResponseT
 from app.graphql.schemas.ExpenseSchema import ExpenseResponseType,ExpenseGetCategoriesResponseType
 from app.graphql.queries.testQuery import TestQuery
 from app.graphql.queries.expenseQuery import ExpenseQuery
+from app.graphql.mutations.incomeMutation import IncomeMutation
+from app.graphql.schemas.IncomeSchema import AddIncomeResponseType
+from app.graphql.queries.chartQuery import ChartQuery
+from app.graphql.schemas.chartSchema import accumulatedDataResponseType
 
 # from app.graphql.queries.testQuery import 
 @strawberry.type
@@ -20,9 +24,11 @@ class Mutation:
     addNewGoal:GoalReponseType=strawberry.mutation(resolver=GoalMutation.addNewGoal)
     deleteGoal:GoalReponseType=strawberry.mutation(resolver=GoalMutation.deleteGoal)
     editGoal:GoalReponseType=strawberry.mutation(resolver=GoalMutation.editGoal)
+    addIncome:AddIncomeResponseType=strawberry.mutation(resolver=IncomeMutation.createIncome)
 
 @strawberry.type
 class Query:
     testQuery:str=strawberry.mutation(resolver=TestQuery.testQuery)
     getAllExpenseCategories:ExpenseGetCategoriesResponseType=strawberry.mutation(resolver=ExpenseQuery.getAllExpenseCategories)
     getAllUserGoals:AllUserGoalsResponseType=strawberry.mutation(resolver=GoalQuery.getAllUserGoals)
+    getAccumulatedData:accumulatedDataResponseType=strawberry.mutation(resolver=ChartQuery.getAccumulatedData)
