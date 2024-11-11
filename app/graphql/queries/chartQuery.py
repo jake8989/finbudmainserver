@@ -38,4 +38,20 @@ class ChartQuery():
         except Exception as e:
             print(e)
             return accumulatedDataResponseType(success=False,message="Error")
+        
+    
+    @staticmethod
+    async def getCategoryWiseExpenseData(data:accumulatedDataInput):
+        try:
+            all_expenses = await database.db['expenses'].find(
+                {"username": data.username, "expenseDate": {"$regex": f"^{data.year}"}}
+            ).to_list(length=None)
+    
+            
+           
+           
+        
+    
+        except Exception as e:
+            print(e)    
     
