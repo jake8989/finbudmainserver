@@ -13,7 +13,8 @@ from app.graphql.mutations.incomeMutation import IncomeMutation
 from app.graphql.schemas.IncomeSchema import AddIncomeResponseType
 from app.graphql.queries.chartQuery import ChartQuery
 from app.graphql.schemas.chartSchema import accumulatedDataResponseType
-
+from app.graphql.schemas.feedbackSchema import FeedBackResponseType
+from app.graphql.mutations.feedbackMutation import FeedBackMutation
 # from app.graphql.queries.testQuery import 
 @strawberry.type
 class Mutation:
@@ -25,6 +26,7 @@ class Mutation:
     deleteGoal:GoalReponseType=strawberry.mutation(resolver=GoalMutation.deleteGoal)
     editGoal:GoalReponseType=strawberry.mutation(resolver=GoalMutation.editGoal)
     addIncome:AddIncomeResponseType=strawberry.mutation(resolver=IncomeMutation.createIncome)
+    newFeedBack:FeedBackResponseType=strawberry.mutation(resolver=FeedBackMutation.newFeedBack)
 
 @strawberry.type
 class Query:
