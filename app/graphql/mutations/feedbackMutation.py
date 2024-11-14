@@ -16,7 +16,7 @@ class FeedBackMutation():
             )
             
             await database.db['feedbacks'].insert_one(newFeedback.model_dump(by_alias=True))
-            return FeedBackResponseType(success=True,message='Added!')
+            return FeedBackResponseType(success=True,message='FeedBack Received, Thank You!')
             
             pass
         except Exception as E:
