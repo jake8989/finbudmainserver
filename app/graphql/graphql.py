@@ -12,7 +12,7 @@ from app.graphql.queries.expenseQuery import ExpenseQuery
 from app.graphql.mutations.incomeMutation import IncomeMutation
 from app.graphql.schemas.IncomeSchema import AddIncomeResponseType
 from app.graphql.queries.chartQuery import ChartQuery
-from app.graphql.schemas.chartSchema import accumulatedDataResponseType
+from app.graphql.schemas.chartSchema import accumulatedDataResponseType,categoryWiseMonthlyExpensesResponse
 from app.graphql.schemas.feedbackSchema import FeedBackResponseType
 from app.graphql.mutations.feedbackMutation import FeedBackMutation
 # from app.graphql.queries.testQuery import 
@@ -34,3 +34,4 @@ class Query:
     getAllExpenseCategories:ExpenseGetCategoriesResponseType=strawberry.mutation(resolver=ExpenseQuery.getAllExpenseCategories)
     getAllUserGoals:AllUserGoalsResponseType=strawberry.mutation(resolver=GoalQuery.getAllUserGoals)
     getAccumulatedData:accumulatedDataResponseType=strawberry.mutation(resolver=ChartQuery.getAccumulatedData)
+    getCategoryWiseExpenseData:categoryWiseMonthlyExpensesResponse=strawberry.mutation(resolver=ChartQuery.getCategoryWiseExpenseData)

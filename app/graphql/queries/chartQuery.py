@@ -1,6 +1,6 @@
 import strawberry
 from app.db.config import database
-from app.graphql.schemas.chartSchema import accumulatedDataInput,accumulatedDataResponseType,incomeType,expenseType
+from app.graphql.schemas.chartSchema import accumulatedDataInput,accumulatedDataResponseType,incomeType,expenseType,categoryWiseMonthlyExpensesResponse,cateogoryWiseExpense
 # from app.graphql.schemas.chartSchema
 @strawberry.type
 class ChartQuery():
@@ -41,17 +41,38 @@ class ChartQuery():
         
     
     @staticmethod
-    async def getCategoryWiseExpenseData(data:accumulatedDataInput):
+    async def getCategoryWiseExpenseData(data:accumulatedDataInput)->categoryWiseMonthlyExpensesResponse:
         try:
             all_expenses = await database.db['expenses'].find(
                 {"username": data.username, "expenseDate": {"$regex": f"^{data.year}"}}
             ).to_list(length=None)
-    
             
-           
-           
+            category_data={}
+            
+            for expenses in all_expenses:
+                category=expenses['category']
+                amount=expenses['amount']
+                month = int(expenses['expenseDate'].split('-')[1])
+                
+                
+                if category not in category_data:
+                    category_data[category]=[0]*12
+                
+                category_data[category][month-1]+=amount
+            # print(category_data)    
+            results=[
+                cateogoryWiseExpense(label=category,data=monthly_data) for category,monthly_data in category_data.items()
+            ]      
+
         
+            
+            return categoryWiseMonthlyExpensesResponse(success=True,message="Tested Fine!",categoryWiseExpenses=results)        
+                    
+                
+                    
     
         except Exception as e:
-            print(e)    
+            print(e)
+            return categoryWiseMonthlyExpensesResponse(success=False,message=e)
+            
     
