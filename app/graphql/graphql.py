@@ -15,6 +15,8 @@ from app.graphql.queries.chartQuery import ChartQuery
 from app.graphql.schemas.chartSchema import accumulatedDataResponseType,categoryWiseMonthlyExpensesResponse
 from app.graphql.schemas.feedbackSchema import FeedBackResponseType
 from app.graphql.mutations.feedbackMutation import FeedBackMutation
+from app.graphql.mutations.OTPMutation import OTPMutation
+from app.graphql.schemas.OTP import OTPSendResponseType
 # from app.graphql.queries.testQuery import 
 @strawberry.type
 class Mutation:
@@ -27,6 +29,8 @@ class Mutation:
     editGoal:GoalReponseType=strawberry.mutation(resolver=GoalMutation.editGoal)
     addIncome:AddIncomeResponseType=strawberry.mutation(resolver=IncomeMutation.createIncome)
     newFeedBack:FeedBackResponseType=strawberry.mutation(resolver=FeedBackMutation.newFeedBack)
+    generateAndSendOTP:OTPSendResponseType=strawberry.mutation(resolver=OTPMutation.generateAndSendOTP)
+    verifyOTP:OTPSendResponseType=strawberry.mutation(resolver=OTPMutation.verifyOTP)
 
 @strawberry.type
 class Query:

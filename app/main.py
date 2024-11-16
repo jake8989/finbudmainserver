@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 from app.graphql.graphql import Mutation,Query
 from fastapi.middleware.cors import CORSMiddleware
 from app.graphql.queries.chartQuery import accumulatedDataInput
+
 load_dotenv()
 
 @asynccontextmanager

@@ -18,6 +18,9 @@ class UserMutations:
     async def registerUser(self,user:UserInput)->UserMutationResponse:
         try:
             existing_user=await database.db['users'].find_one({"username":user.username})
+            existing_email=await database.db['users'].find_one({"email":user.email})
+            if existing_email:
+                 return UserMutationResponse(success=False,message='Email Already in use')
            
             
             if existing_user:
