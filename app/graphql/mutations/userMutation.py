@@ -19,7 +19,7 @@ class UserMutations:
     @staticmethod
     async def registerUser(self,user:UserInput)->UserMutationResponse:
         try:
-            existing_user=await database.db['users'].find_one({"username":user.username})
+            existing_user=await database.db['users'].find_one({"username":user.username.upper()})
             existing_email=await database.db['users'].find_one({"email":user.email})
             if existing_email:
                  return UserMutationResponse(success=False,message='Email Already in use')
@@ -34,7 +34,7 @@ class UserMutations:
             #creating temporary user in the db so that after otp verification 
             #we can create a persistance entry in the mongoDB
             new_user=TempUserModal(
-                username=user.username,
+                username=user.username.upper(),
                 email=user.email,
                 password=hashedPassword,
                 settedGoals=0,
@@ -57,7 +57,7 @@ class UserMutations:
     async def loginUser(self,user:UserLoginInput)->UserMutationResponse:
         try:
            # find weather this user exists or not with username
-           exist_user_username=await database.db['users'].find_one({"username":user.usernameoremail})
+           exist_user_username=await database.db['users'].find_one({"username":user.usernameoremail.upper()})
            exist_user_email=await database.db['users'].find_one({"email":user.usernameoremail})
         #    print(user)
            exist_user={}

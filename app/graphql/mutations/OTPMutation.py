@@ -30,7 +30,7 @@ class OTPMutation():
 
                 exits_otp_ratelimiter=await database.db['otp_rate_limiters'].find_one({"email":otp.email})
                 if exits_otp_ratelimiter:
-                    if exits_otp_ratelimiter.time>4:
+                    if exits_otp_ratelimiter['times']>4:
                         return OTPSendResponseType(success=False,message="OTP generation limit exceeds! please use other email!")
                 
                 if response.success:
@@ -75,7 +75,7 @@ class OTPMutation():
                      
                      
                     new_user =UserModal(
-                        username=temp_user['username'],
+                        username=temp_user['username'].upper(),
                         email=temp_user['email'],
                         password=temp_user['password'],
                         settedGoals=temp_user['settedGoals'],
