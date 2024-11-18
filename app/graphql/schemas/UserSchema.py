@@ -30,7 +30,7 @@ class UserType():
 
 @strawberry.input
 class UserLoginInput():
-    username:str
+    usernameoremail:str
     password:str
 
 @strawberry.input

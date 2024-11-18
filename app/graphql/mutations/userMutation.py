@@ -49,12 +49,22 @@ class UserMutations:
     async def loginUser(self,user:UserLoginInput)->UserMutationResponse:
         try:
            # find weather this user exists or not with username
-           exist_user=await database.db['users'].find_one({"username":user.username})
-           print(user)
+           exist_user_username=await database.db['users'].find_one({"username":user.usernameoremail})
+           exist_user_email=await database.db['users'].find_one({"email":user.usernameoremail})
+        #    print(user)
+           exist_user={}
+                   
+           if exist_user_username is not None:
+                exist_user=exist_user_username
+           elif exist_user_email is not None:
+                exist_user=exist_user_email
+                
            if exist_user:
                verify_password=await PasswordHasher.VerifyPassword(password=user.password,hashedPassword=exist_user['password'])
                if verify_password:
-                   token=await JwtToken.CreateToken({"username":exist_user['username']})
+                   
+                           
+                   token=await JwtToken.CreateToken({"usernameoremail":exist_user['username']})
                    return UserMutationResponse(success=True,message="Logged In Successfully",token=token,user=UserType(username=exist_user['username'],email=exist_user['email']))
 
                return UserMutationResponse(success=False,message='Invalid Credentails')    
