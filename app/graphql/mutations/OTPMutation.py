@@ -4,6 +4,9 @@ import os
 from app.gRPC import otp_pb2,otp_pb2_grpc
 from app.graphql.schemas.OTP import OTPinput,OTPSendResponseType,VerifyOTPType
 from dotenv import load_dotenv
+from app.modals.UserModel import UserModal
+from app.db.config import database
+from app.graphql.schemas.UserSchema import UserType
 load_dotenv()
 server_port=os.getenv('AUTH_SERVER')
 class OTPMutation():
@@ -42,10 +45,29 @@ class OTPMutation():
                 
                 if response.success:
                     print("OK!")
-                    return OTPSendResponseType(success=True,message='OTP Verified')
+                    temp_user=await database.db['temp_users'].find_one({"email":otp.email})
+                    exist_user=await database.db['users'].find_one({"email":otp.email})
+                    if exist_user:
+                        return OTPSendResponseType(success=False,message="User Exists!")
+                    if not temp_user:
+                        return OTPSendResponseType(success=False,message="Please Use new OTP")
+                     
+                     
+                    new_user =UserModal(
+                        username=temp_user['username'],
+                        email=temp_user['email'],
+                        password=temp_user['password'],
+                        settedGoals=temp_user['settedGoals'],
+                        goals=temp_user['goals'],
+                        expenseCategories=temp_user['expenseCategories'] 
+                    )
+                    
+                    await database.db['users'].insert_one(new_user.model_dump(by_alias=True))
+                    
+                    return OTPSendResponseType(success=True,message='OTP Verified',user=UserType(username=new_user.username,email=new_user.email))
                 else:
                     print("Not verified")
-                    return OTPSendResponseType(success=False,message="Not Verified")
+                    return OTPSendResponseType(success=False,message="OTP Not Verified")
                     
         except Exception as e:
             print(e)

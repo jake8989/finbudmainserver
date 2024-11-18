@@ -3,9 +3,11 @@ from app.graphql.schemas.UserSchema import UserType,UserInput,UserLoginInput
 from app.db.config import database
 from pydantic import BaseModel
 from typing import Optional
-from app.modals.UserModel import UserModal
+from app.modals.UserModel import UserModal,TempUserModal
 from app.utils.passwordHasher import PasswordHasher
-from app.utils.jwt import JwtToken
+from app.utils.jwt import JwtToken  
+from datetime import datetime,time,timedelta,timezone
+from pymongo import ASCENDING
 @strawberry.type
 class UserMutationResponse:
     success:bool
@@ -27,20 +29,26 @@ class UserMutations:
                 return UserMutationResponse(success=False,message='Username Already in use')
             #pydentic modal for extra type and shape safety
             hashedPassword=await PasswordHasher.Hash(user.password)
-            new_user=UserModal(
+            # datetime.utcnow()
+            expiresAt = datetime.now(timezone.utc)+timedelta(seconds=300)
+            #creating temporary user in the db so that after otp verification 
+            #we can create a persistance entry in the mongoDB
+            new_user=TempUserModal(
                 username=user.username,
                 email=user.email,
                 password=hashedPassword,
                 settedGoals=0,
                 goals=[],
-                expenseCategories=[]
+                expenseCategories=[],
+                expiresAt=expiresAt
             )
+            await database.db['temp_users'].create_index([("expiresAt", ASCENDING)], expireAfterSeconds=0)
 
-            token=await JwtToken.CreateToken({"username":user.username})
+            # token=await JwtToken.CreateToken({"username":user.username})
 
-            await database.db['users'].insert_one(new_user.model_dump(by_alias=True))
+            await database.db['temp_users'].insert_one(new_user.model_dump(by_alias=True))
 
-            return UserMutationResponse(success=True,message='User Created Successfully',token=token, user=UserType(username=new_user.username,email=new_user.email))
+            return UserMutationResponse(success=True,message='Proceed With OTP',user=UserType(username=new_user.username,email=new_user.email))
         except Exception as e:
             return UserMutationResponse(success=False,message=e)
             

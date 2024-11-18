@@ -35,6 +35,7 @@ class JwtToken:
     async def VerifyToken(token: str):
         try:
             jwt_secret = os.getenv('JWT_SECRET')
+           
             if not jwt_secret:
                 return None
                 
