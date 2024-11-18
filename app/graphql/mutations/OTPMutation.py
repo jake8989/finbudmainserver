@@ -5,21 +5,42 @@ from app.gRPC import otp_pb2,otp_pb2_grpc
 from app.graphql.schemas.OTP import OTPinput,OTPSendResponseType,VerifyOTPType
 from dotenv import load_dotenv
 from app.modals.UserModel import UserModal
+from app.modals.OTPRateModel import OTPRateLimitModel
 from app.db.config import database
 from app.graphql.schemas.UserSchema import UserType
+
 load_dotenv()
 server_port=os.getenv('AUTH_SERVER')
 class OTPMutation():
     @staticmethod
     async def generateAndSendOTP(otp: OTPinput) -> OTPSendResponseType:
         try:
+            if otp.email=='' or not otp.email:
+                OTPSendResponseType(success=False,message="Please Provide Email!")
+                
             async with grpc.aio.insecure_channel(server_port) as channel:
                 stub = otp_pb2_grpc.OTPServiceStub(channel)
                 request = otp_pb2.GenerateOTPRequest(email=otp.email)
                 response = await stub.GenerateOTP(request)
+                
+                new_otp_ratelimit=OTPRateLimitModel(
+                    email=otp.email,
+                    times=0
+                )
 
+                exits_otp_ratelimiter=await database.db['otp_rate_limiters'].find_one({"email":otp.email})
+                if exits_otp_ratelimiter:
+                    if exits_otp_ratelimiter.time>4:
+                        return OTPSendResponseType(success=False,message="OTP generation limit exceeds! please use other email!")
+                
                 if response.success:
                     print("Success!")
+                    if not exits_otp_ratelimiter:
+                       await database.db['otp_rate_limiters'].insert_one(new_otp_ratelimit.model_dump(by_alias=True))
+                       
+                    if exits_otp_ratelimiter:
+                        await database.db['otp_rate_limiters'].update_one({"email":otp.email},{"$set":{"times":exits_otp_ratelimiter['times']+1}})
+                    
                     return OTPSendResponseType(success=True, message="OTP Sent")
                 else:
                     print("Failed to send OTP")
