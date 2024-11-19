@@ -58,6 +58,9 @@ class OTPMutation():
     @staticmethod    
     async def verifyOTP(otp:VerifyOTPType)->OTPSendResponseType:
         try:
+            if otp.email=='' or (not otp.email):
+                OTPSendResponseType(success=False,message="Please Provide Email!")
+                
             async with grpc.aio.insecure_channel(server_port) as channel:
                 stub = otp_pb2_grpc.OTPServiceStub(channel=channel)
                 request=otp_pb2.VerifyOTPRequest(email=otp.email,otp=otp.otp)
