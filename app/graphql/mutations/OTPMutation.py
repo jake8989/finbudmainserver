@@ -11,6 +11,7 @@ from app.graphql.schemas.UserSchema import UserType
 
 load_dotenv()
 server_port = os.getenv("AUTH_SERVER")
+print(server_port)
 
 
 class OTPMutation:
@@ -24,6 +25,7 @@ class OTPMutation:
                 stub = otp_pb2_grpc.OTPServiceStub(channel)
                 request = otp_pb2.GenerateOTPRequest(email=otp.email)
                 response = await stub.GenerateOTP(request)
+                print(response)
 
                 new_otp_ratelimit = OTPRateLimitModel(email=otp.email, times=0)
 
@@ -91,7 +93,8 @@ class OTPMutation:
                         )
                     if not temp_user:
                         return OTPSendResponseType(
-                            success=False, message="Please Use new OTP"
+                            success=False,
+                            message="Please generate new OTP as time OTP time expired!",
                         )
 
                     new_user = UserModal(
