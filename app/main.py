@@ -21,7 +21,7 @@ async def lifespan(app: FastAPI):
 
 schema = strawberry.Schema(query=Query, mutation=Mutation)
 
-graphql_app = GraphQLRouter(schema)
+graphql_app = GraphQLRouter(schema, graphiql=False)
 
 # print(os.getenv('DB_URL'))
 app = FastAPI(lifespan=lifespan)
