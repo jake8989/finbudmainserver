@@ -18,8 +18,11 @@ class OTPMutation:
     @staticmethod
     async def generateAndSendOTP(otp: OTPinput) -> OTPSendResponseType:
         try:
+
             if otp.email == "" or not otp.email:
-                OTPSendResponseType(success=False, message="Please Provide Email!")
+                return OTPSendResponseType(
+                    success=False, message="Please Provide Email!"
+                )
 
             async with grpc.aio.insecure_channel(server_port) as channel:
                 stub = otp_pb2_grpc.OTPServiceStub(channel)
