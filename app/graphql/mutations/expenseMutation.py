@@ -51,8 +51,8 @@ class ExpenseMutation:
                     newGoalAmount = (
                         exist_goal_with_same_category["goalAmount"] - expense.amount
                     )
-                    if newGoalAmount < 0:
-                        newGoalAmount = 0
+                    # if newGoalAmount < 0:
+                    #     newGoalAmount = 0
 
                     await database.db["users"].update_one(
                         {

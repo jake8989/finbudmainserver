@@ -19,7 +19,7 @@ class IncomeMutation:
             newIncome = IncomeModel(
                 incomeId=str(uuid.uuid4()),
                 username=income.username,
-                amount=int(income.amount),
+                amount=income.amount,
                 category=income.category,
                 incomeDate=income.incomeDate,
                 description=income.description,

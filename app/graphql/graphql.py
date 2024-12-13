@@ -26,6 +26,8 @@ from app.graphql.schemas.feedbackSchema import FeedBackResponseType
 from app.graphql.mutations.feedbackMutation import FeedBackMutation
 from app.graphql.mutations.OTPMutation import OTPMutation
 from app.graphql.schemas.OTP import OTPSendResponseType
+from app.graphql.queries.reportsQuery import ReportsQuery
+from app.graphql.schemas.reportSchema import ReportInput, ReportResponse
 
 
 # from app.graphql.queries.testQuery import
@@ -75,4 +77,7 @@ class Query:
     )
     getCategoryWiseExpenseData: categoryWiseMonthlyExpensesResponse = (
         strawberry.mutation(resolver=ChartQuery.getCategoryWiseExpenseData)
+    )
+    generateReport: ReportResponse = strawberry.mutation(
+        resolver=ReportsQuery.generateReport
     )
