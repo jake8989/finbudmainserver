@@ -29,3 +29,7 @@ venv/
 
 # Windows files
 Thumbs.db
+/repots
+/app/reports
+./app/reports
+app/reports

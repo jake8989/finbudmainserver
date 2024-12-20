@@ -19,7 +19,7 @@ class ExpenseType:
 class GoalType:
     goalId: str
     username: str
-    goalAmount: int
+    goalAmount: float
     startDate: str
     endDate: str
     description: Optional[str] = None

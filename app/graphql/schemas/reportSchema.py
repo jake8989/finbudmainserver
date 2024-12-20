@@ -13,3 +13,10 @@ class ReportInput:
 class ReportResponse:
     success: bool
     message: str
+    reportId: str
+
+
+@strawberry.type
+class downloadReportInput:
+    reportId: str
+    username: str

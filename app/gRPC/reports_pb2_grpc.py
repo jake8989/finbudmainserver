@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import app.gRPC.reports_pb2 as reports__pb2
+from app.gRPC import reports_pb2 as reports__pb2
 
 GRPC_GENERATED_VERSION = "1.68.0"
 GRPC_VERSION = grpc.__version__
